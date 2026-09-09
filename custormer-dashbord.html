@@ -1,0 +1,279 @@
+<?php
+require_once "auth.php";
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Dashboard | SkillConnect</title>
+
+    <link rel="stylesheet" href="dashboard.css">
+
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="dashboard">
+
+
+
+    <aside class="sidebar">
+
+        <div class="logo">
+
+            <h2>skill conect</h2>
+
+        </div>
+
+        <ul>
+
+            <li class="active">
+                <a href="customer-dashboard.html">
+                    <i class="fas fa-home"></i>
+                    Dashboard
+                </a>
+            </li>
+
+            <li>
+                <a href="search-results.html">
+                    <i class="fas fa-search"></i>
+                    Find Providers
+                </a>
+            </li>
+
+            <li>
+                <a href="hire-booking.html">
+                    <i class="fas fa-briefcase"></i>
+                    My Bookings
+                </a>
+            </li>
+
+            <li>
+                <a href="message.html">
+                    <i class="fas fa-comments"></i>
+                    Messages
+                </a>
+            </li>
+
+            <li>
+                <a href="settings.html">
+                    <i class="fas fa-cog"></i>
+                    Settings
+                </a>
+            </li>
+
+            <li>
+                <a href="logout.html">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </a>
+            </li>
+
+        </ul>
+
+    </aside>
+
+    <!-- Main Content -->
+
+    <main class="content">
+
+        <!-- Header -->
+
+        <header class="topbar">
+
+            <div>
+
+                <h1>Welcome Back 👋</h1>
+
+                <p>Find skilled professionals for your next job.</p>
+
+            </div>
+
+            <div class="profile">
+
+                <img src="images/default-user.png" alt="User">
+
+                <span>John Doe</span>
+
+            </div>
+
+        </header>
+
+        <!-- Search -->
+
+        <section class="search-box">
+
+            <input type="text"
+            placeholder="Search for electricians, designers, tutors...">
+
+            <button>
+
+                <i class="fas fa-search"></i>
+
+            </button>
+
+        </section>
+
+        <!-- Statistics -->
+
+        <section class="cards">
+
+            <div class="card">
+
+                <i class="fas fa-briefcase"></i>
+
+                <h3>12</h3>
+
+                <p>Total Bookings</p>
+
+            </div>
+
+            <div class="card">
+
+                <i class="fas fa-clock"></i>
+
+                <h3>3</h3>
+
+                <p>Pending Requests</p>
+
+            </div>
+
+            <div class="card">
+
+                <i class="fas fa-check-circle"></i>
+
+                <h3>9</h3>
+
+                <p>Completed Jobs</p>
+
+            </div>
+
+            <div class="card">
+
+                <i class="fas fa-heart"></i>
+
+                <h3>7</h3>
+
+                <p>Saved Providers</p>
+
+            </div>
+
+        </section>
+
+        <!-- Recent Bookings -->
+
+        <section class="table-section">
+
+            <h2>Recent Bookings</h2>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Provider</th>
+
+                        <th>Service</th>
+
+                        <th>Date</th>
+
+                        <th>Status</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <tr>
+
+                        <td>Michael James</td>
+
+                        <td>Electrician</td>
+
+                        <td>30 July 2026</td>
+
+                        <td><span class="pending">Pending</span></td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>Sarah Johnson</td>
+
+                        <td>Graphic Designer</td>
+
+                        <td>28 July 2026</td>
+
+                        <td><span class="completed">Completed</span></td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </section>
+
+        <!-- Saved Providers -->
+
+        <section class="providers">
+
+            <h2>Recommended Providers</h2>
+
+            <div class="provider-grid">
+
+                <div class="provider-card">
+
+                    <img src="images/provider1.jpg" alt="Provider">
+
+                    <h3>David Wilson</h3>
+
+                    <p>Plumber</p>
+
+                    <p>⭐⭐⭐⭐⭐ (4.9)</p>
+
+                    <a href="provider-profile.php">
+
+                        View Profile
+
+                    </a>
+
+                </div>
+
+                <div class="provider-card">
+
+                    <img src="images/provider2.jpg" alt="Provider">
+
+                    <h3>Grace Adams</h3>
+
+                    <p>Web Developer</p>
+
+                    <p>⭐⭐⭐⭐⭐ (5.0)</p>
+
+                    <a href="provider-profile.php">
+
+                        View Profile
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="js/main.js"></script>
+
+</body>
+</html>

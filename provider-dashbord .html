@@ -1,0 +1,268 @@
+<?php
+require_once "auth.php";
+?>
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Provider Dashboard | SkillConnect</title>
+
+    <link rel="stylesheet" href="dashboard.css">
+
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <!-- Sidebar -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            <h2>skill connect</h2>
+        </div>
+
+        <ul>
+
+            <li class="active">
+                <a href="provider-dashboard.html">
+                    <i class="fas fa-home"></i>
+                    Dashboard
+                </a>
+            </li>
+
+            <li>
+                <a href="provider-profile.html">
+                    <i class="fas fa-user"></i>
+                    My Profile
+                </a>
+            </li>
+
+            <li>
+                <a href="job-requests.html">
+                    <i class="fas fa-briefcase"></i>
+                    Job Requests
+                </a>
+            </li>
+
+            <li>
+                <a href="portfolio.html">
+                    <i class="fas fa-images"></i>
+                    Portfolio
+                </a>
+            </li>
+
+            <li>
+                <a href="message.html">
+                    <i class="fas fa-comments"></i>
+                    Messages
+                </a>
+            </li>
+
+            <li>
+                <a href="settings.html">
+                    <i class="fas fa-cog"></i>
+                    Settings
+                </a>
+            </li>
+
+            <li>
+                <a href="logout.html">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </a>
+            </li>
+
+        </ul>
+
+    </aside>
+
+    
+
+    <main class="content">
+
+        <header class="topbar">
+
+            <div>
+
+                <h1>Welcome, David 👋</h1>
+
+                <p>Manage your services and respond to customer requests.</p>
+
+            </div>
+
+            <div class="profile">
+
+                <img src="images/default-user.png" alt="Profile">
+
+                <span>David Wilson</span>
+
+            </div>
+
+        </header>
+
+       
+
+        <section class="cards">
+
+            <div class="card">
+                <i class="fas fa-envelope-open-text"></i>
+                <h3>18</h3>
+                <p>Job Requests</p>
+            </div>
+
+            <div class="card">
+                <i class="fas fa-check-circle"></i>
+                <h3>42</h3>
+                <p>Completed Jobs</p>
+            </div>
+
+            <div class="card">
+                <i class="fas fa-star"></i>
+                <h3>4.9</h3>
+                <p>Average Rating</p>
+            </div>
+
+            <div class="card">
+                <i class="fas fa-wallet"></i>
+                <h3>₦250K</h3>
+                <p>Total Earnings</p>
+            </div>
+
+        </section>
+
+       
+        <section class="table-section">
+
+            <h2>Recent Job Requests</h2>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Customer</th>
+
+                        <th>Service</th>
+
+                        <th>Budget</th>
+
+                        <th>Status</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <tr>
+
+                        <td>John Doe</td>
+
+                        <td>Electrical Repair</td>
+
+                        <td>₦20,000</td>
+
+                        <td><span class="pending">Pending</span></td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>Sarah James</td>
+
+                        <td>Website Design</td>
+
+                        <td>₦120,000</td>
+
+                        <td><span class="completed">Accepted</span></td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>Michael King</td>
+
+                        <td>Plumbing</td>
+
+                        <td>₦35,000</td>
+
+                        <td><span class="completed">Completed</span></td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </section>
+
+        <!-- Portfolio -->
+
+        <section class="providers">
+
+            <h2>Portfolio</h2>
+
+            <div class="provider-grid">
+
+                <div class="provider-card">
+
+                    <img src="images/provider1.jpg" alt="Project">
+
+                    <h3>Kitchen Wiring</h3>
+
+                    <p>Completed in Lekki</p>
+
+                    <a href="#">
+                        View Details
+                    </a>
+
+                </div>
+
+                <div class="provider-card">
+
+                    <img src="images/provider2.jpg" alt="Project">
+
+                    <h3>Office Installation</h3>
+
+                    <p>Commercial Project</p>
+
+                    <a href="#">
+                        View Details
+                    </a>
+
+                </div>
+
+                <div class="provider-card">
+
+                    <img src="images/provider3.jpg" alt="Project">
+
+                    <h3>Home Renovation</h3>
+
+                    <p>Electrical Upgrade</p>
+
+                    <a href="#">
+                        View Details
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="js/main.js"></script>
+
+</body>
+</html>

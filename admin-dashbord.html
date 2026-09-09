@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | SkillConnect</title>
+
+    <link rel="stylesheet" href="css/dashboard.css">
+
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <!-- Sidebar -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            <h2>skill conect</h2>
+        </div>
+
+        <ul>
+
+            <li class="active">
+                <a href="admin-dashboard.php">
+                    <i class="fas fa-chart-line"></i>
+                    Dashboard
+                </a>
+            </li>
+
+            <li>
+                <a href="manage-users.php">
+                    <i class="fas fa-users"></i>
+                    Manage Users
+                </a>
+            </li>
+
+            <li>
+                <a href="manage-providers.php">
+                    <i class="fas fa-user-check"></i>
+                    Providers
+                </a>
+            </li>
+
+            <li>
+                <a href="manage-jobs.php">
+                    <i class="fas fa-briefcase"></i>
+                    Jobs
+                </a>
+            </li>
+
+            <li>
+                <a href="categories.php">
+                    <i class="fas fa-list"></i>
+                    Categories
+                </a>
+            </li>
+
+            <li>
+                <a href="reports.php">
+                    <i class="fas fa-flag"></i>
+                    Reports
+                </a>
+            </li>
+
+            <li>
+                <a href="settings.php">
+                    <i class="fas fa-cog"></i>
+                    Settings
+                </a>
+            </li>
+
+            <li>
+                <a href="logout.php">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </a>
+            </li>
+
+        </ul>
+
+    </aside>
+
+    <!-- Main Content -->
+
+    <main class="content">
+
+        <!-- Top Bar -->
+
+        <header class="topbar">
+
+            <div>
+
+                <h1>Administrator Dashboard</h1>
+
+                <p>Monitor and manage the SkillConnect platform.</p>
+
+            </div>
+
+            <div class="profile">
+
+                <img src="images/admin.png" alt="Admin">
+
+                <span>Administrator</span>
+
+            </div>
+
+        </header>
+
+        <!-- Statistics -->
+
+        <section class="cards">
+
+            <div class="card">
+                <i class="fas fa-users"></i>
+                <h3>1,240</h3>
+                <p>Total Users</p>
+            </div>
+
+            <div class="card">
+                <i class="fas fa-user-tie"></i>
+                <h3>420</h3>
+                <p>Service Providers</p>
+            </div>
+
+            <div class="card">
+                <i class="fas fa-briefcase"></i>
+                <h3>785</h3>
+                <p>Jobs Posted</p>
+            </div>
+
+            <div class="card">
+                <i class="fas fa-wallet"></i>
+                <h3>₦15.8M</h3>
+                <p>Platform Revenue</p>
+            </div>
+
+        </section>
+
+        <!-- Recent Users -->
+
+        <section class="table-section">
+
+            <h2>Recently Registered Users</h2>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Name</th>
+
+                        <th>Email</th>
+
+                        <th>Role</th>
+
+                        <th>Status</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <tr>
+
+                        <td>John Doe</td>
+
+                        <td>john@email.com</td>
+
+                        <td>Customer</td>
+
+                        <td><span class="completed">Active</span></td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>Grace Adams</td>
+
+                        <td>grace@email.com</td>
+
+                        <td>Provider</td>
+
+                        <td><span class="pending">Pending Verification</span></td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>Michael James</td>
+
+                        <td>michael@email.com</td>
+
+                        <td>Provider</td>
+
+                        <td><span class="completed">Verified</span></td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </section>
+
+        <!-- Quick Actions -->
+
+        <section class="providers">
+
+            <h2>Admin Quick Actions</h2>
+
+            <div class="provider-grid">
+
+                <div class="provider-card">
+
+                    <i class="fas fa-user-check" style="font-size:60px;color:#0d6efd;"></i>
+
+                    <h3>Verify Providers</h3>
+
+                    <p>Approve or reject new provider accounts.</p>
+
+                    <a href="manage-providers.php">
+                        Open
+                    </a>
+
+                </div>
+
+                <div class="provider-card">
+
+                    <i class="fas fa-folder-open" style="font-size:60px;color:#0d6efd;"></i>
+
+                    <h3>Manage Categories</h3>
+
+                    <p>Add, edit or remove service categories.</p>
+
+                    <a href="categories.php">
+                        Open
+                    </a>
+
+                </div>
+
+                <div class="provider-card">
+
+                    <i class="fas fa-chart-pie" style="font-size:60px;color:#0d6efd;"></i>
+
+                    <h3>Analytics</h3>
+
+                    <p>Monitor platform growth and performance.</p>
+
+                    <a href="#">
+                        View
+                    </a>
+
+                </div>
+
+                <div class="provider-card">
+
+                    <i class="fas fa-flag" style="font-size:60px;color:#0d6efd;"></i>
+
+                    <h3>User Reports</h3>
+
+                    <p>Review complaints and moderate activity.</p>
+
+                    <a href="reports.php">
+                        Review
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- Platform Activity -->
+
+        <section class="table-section">
+
+            <h2>Recent Platform Activity</h2>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Activity</th>
+
+                        <th>User</th>
+
+                        <th>Date</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <tr>
+
+                        <td>New Provider Registered</td>
+
+                        <td>David Wilson</td>
+
+                        <td>30 Jul 2026</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>Job Completed</td>
+
+                        <td>Sarah Johnson</td>
+
+                        <td>30 Jul 2026</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>New Customer Signup</td>
+
+                        <td>James Peter</td>
+
+                        <td>29 Jul 2026</td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="js/main.js"></script>
+
+</body>
+</html>
