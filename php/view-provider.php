@@ -1,13 +1,21 @@
 <?php
+
 require_once "auth.php";
 require_once "db.php";
 
-// Get provider ID
+// Only customers can view provider profiles
+if ($_SESSION["role"] != "customer") {
+    die("Access denied.");
+}
+
+
+// Check provider ID
 if (!isset($_GET["id"]) || !is_numeric($_GET["id"])) {
     die("Invalid provider.");
 }
 
 $provider_id = intval($_GET["id"]);
+
 
 // Get provider information
 $stmt = $conn->prepare("
@@ -18,12 +26,12 @@ $stmt = $conn->prepare("
         users.phone,
         provider_profiles.skill,
         provider_profiles.description,
-        provider_profiles.location,
-        provider_profiles.price,
-        provider_profiles.profile_image
+        provider_profiles.location
     FROM users
+
     INNER JOIN provider_profiles
         ON users.id = provider_profiles.user_id
+
     WHERE users.id = ?
       AND users.role = 'provider'
 ");
@@ -38,10 +46,31 @@ if ($result->num_rows == 0) {
 }
 
 $provider = $result->fetch_assoc();
+
 $stmt->close();
 
 
-// Get average rating and review count
+// Get provider services
+$stmt = $conn->prepare("
+    SELECT
+        id,
+        service_name,
+        description,
+        price
+    FROM services
+    WHERE provider_id = ?
+    ORDER BY service_name ASC
+");
+
+$stmt->bind_param("i", $provider_id);
+$stmt->execute();
+
+$services = $stmt->get_result();
+
+$stmt->close();
+
+
+// Get provider rating
 $stmt = $conn->prepare("
     SELECT
         AVG(rating) AS average_rating,
@@ -54,40 +83,36 @@ $stmt->bind_param("i", $provider_id);
 $stmt->execute();
 
 $rating_result = $stmt->get_result();
-$rating_data = $rating_result->fetch_assoc();
-
-$average_rating = $rating_data["average_rating"];
-$review_count = $rating_data["review_count"];
+$rating = $rating_result->fetch_assoc();
 
 $stmt->close();
 
+$average_rating = $rating["average_rating"];
+$review_count = $rating["review_count"];
 
-// Get individual reviews
+
+// Get reviews
 $stmt = $conn->prepare("
     SELECT
         reviews.rating,
         reviews.comment,
         reviews.created_at,
         users.full_name AS customer_name
+
     FROM reviews
+
     INNER JOIN users
         ON reviews.customer_id = users.id
+
     WHERE reviews.provider_id = ?
+
     ORDER BY reviews.created_at DESC
 ");
 
 $stmt->bind_param("i", $provider_id);
 $stmt->execute();
 
-$reviews_result = $stmt->get_result();
-
-
-// Set rating display
-if ($average_rating !== null) {
-    $average_rating_display = number_format($average_rating, 1);
-} else {
-    $average_rating_display = "No rating";
-}
+$reviews = $stmt->get_result();
 
 ?>
 
@@ -98,13 +123,20 @@ if ($average_rating !== null) {
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>
-        <?php echo htmlspecialchars($provider["full_name"]); ?> - JobWalk
+        <?php echo htmlspecialchars($provider["full_name"]); ?>
+        - SkillConnect
     </title>
 
-    <link rel="stylesheet" href="../css/dashboard.css">
+    <link
+        rel="stylesheet"
+        href="../css/dashboard.css"
+    >
 
     <link
         rel="stylesheet"
@@ -113,17 +145,19 @@ if ($average_rating !== null) {
 
 </head>
 
+
 <body>
 
 <div class="dashboard-container">
+
 
     <!-- SIDEBAR -->
 
     <aside class="sidebar">
 
-        <h2>JobWalk</h2>
+        <h2>SkillConnect</h2>
 
-        <p>Find the right person for the job.</p>
+        <p>Customer Dashboard</p>
 
         <nav>
 
@@ -162,35 +196,86 @@ if ($average_rating !== null) {
     </aside>
 
 
+
     <!-- MAIN CONTENT -->
 
     <main class="main-content">
 
-        <a href="search-results.php" class="btn">
+
+        <a
+            href="search-results.php"
+            class="btn"
+        >
+
             <i class="fas fa-arrow-left"></i>
+
             Back to Search
+
         </a>
+
 
 
         <!-- PROVIDER PROFILE -->
 
         <div class="profile-card">
 
-            <div class="profile-header">
+            <h1>
+                <?php
+                echo htmlspecialchars(
+                    $provider["full_name"]
+                );
+                ?>
+            </h1>
 
-                <div>
 
-                    <h1>
-                        <?php echo htmlspecialchars($provider["full_name"]); ?>
-                    </h1>
+            <h3>
 
-                    <h3>
-                        <?php echo htmlspecialchars($provider["skill"]); ?>
-                    </h3>
+                <i class="fas fa-briefcase"></i>
 
-                </div>
+                <?php
+                echo htmlspecialchars(
+                    $provider["skill"]
+                );
+                ?>
 
-            </div>
+            </h3>
+
+
+            <p>
+
+                <strong>
+                    Location:
+                </strong>
+
+                <?php
+                echo htmlspecialchars(
+                    $provider["location"]
+                );
+                ?>
+
+            </p>
+
+
+            <p>
+
+                <strong>
+                    About:
+                </strong>
+
+            </p>
+
+
+            <p>
+
+                <?php
+                echo nl2br(
+                    htmlspecialchars(
+                        $provider["description"]
+                    )
+                );
+                ?>
+
+            </p>
 
 
             <!-- RATING -->
@@ -198,20 +283,31 @@ if ($average_rating !== null) {
             <div class="rating-section">
 
                 <h3>
-                    <i class="fas fa-star"></i>
                     Rating
                 </h3>
+
 
                 <?php if ($average_rating !== null): ?>
 
                     <p>
+
                         <strong>
-                            <?php echo $average_rating_display; ?>/5
+
+                            <?php
+                            echo number_format(
+                                $average_rating,
+                                1
+                            );
+                            ?>
+
+                            / 5
+
                         </strong>
 
                         ⭐⭐⭐⭐⭐
 
                         (<?php echo $review_count; ?> reviews)
+
                     </p>
 
                 <?php else: ?>
@@ -225,65 +321,31 @@ if ($average_rating !== null) {
             </div>
 
 
-            <!-- PROVIDER INFORMATION -->
-
-            <div class="profile-info">
-
-                <p>
-                    <strong>Skill:</strong>
-
-                    <?php echo htmlspecialchars($provider["skill"]); ?>
-                </p>
-
-
-                <p>
-                    <strong>Location:</strong>
-
-                    <?php echo htmlspecialchars($provider["location"]); ?>
-                </p>
-
-
-                <p>
-                    <strong>Price:</strong>
-
-                    ₦<?php echo number_format($provider["price"], 2); ?>
-                </p>
-
-
-                <p>
-                    <strong>Description:</strong>
-                </p>
-
-                <p>
-                    <?php
-                    echo nl2br(
-                        htmlspecialchars($provider["description"])
-                    );
-                    ?>
-                </p>
-
-            </div>
-
-
             <!-- ACTION BUTTONS -->
 
             <div class="profile-actions">
 
                 <a
-                    href="hirebooking.php?provider_id=<?php echo $provider["id"]; ?>"
+                    href="hirebooking.php?provider_id=<?php echo $provider_id; ?>"
                     class="btn"
                 >
+
                     <i class="fas fa-calendar-check"></i>
-                    Hire This Provider
+
+                    Hire Provider
+
                 </a>
 
 
                 <a
-                    href="messages.php?user_id=<?php echo $provider["id"]; ?>"
+                    href="messages.php?user_id=<?php echo $provider_id; ?>"
                     class="btn"
                 >
+
                     <i class="fas fa-comment"></i>
+
                     Message Provider
+
                 </a>
 
             </div>
@@ -291,28 +353,36 @@ if ($average_rating !== null) {
         </div>
 
 
-        <!-- REVIEWS -->
 
-        <div class="reviews-section">
+        <!-- SERVICES -->
+
+        <div class="profile-card">
 
             <h2>
-                <i class="fas fa-star"></i>
-                Customer Reviews
+
+                <i class="fas fa-briefcase"></i>
+
+                Services Offered
+
             </h2>
 
 
-            <?php if ($reviews_result->num_rows > 0): ?>
+            <?php if ($services->num_rows > 0): ?>
 
-                <?php while ($review = $reviews_result->fetch_assoc()): ?>
+
+                <?php while ($service = $services->fetch_assoc()): ?>
 
                     <div class="review-card">
 
+
                         <h3>
+
                             <?php
                             echo htmlspecialchars(
-                                $review["customer_name"]
+                                $service["service_name"]
                             );
                             ?>
+
                         </h3>
 
 
@@ -320,9 +390,115 @@ if ($average_rating !== null) {
 
                             <?php
 
-                            for ($i = 1; $i <= 5; $i++) {
+                            if (!empty($service["description"])) {
 
-                                if ($i <= $review["rating"]) {
+                                echo nl2br(
+                                    htmlspecialchars(
+                                        $service["description"]
+                                    )
+                                );
+
+                            } else {
+
+                                echo "No description provided.";
+
+                            }
+
+                            ?>
+
+                        </p>
+
+
+                        <h3>
+
+                            ₦<?php
+
+                            echo number_format(
+                                $service["price"],
+                                2
+                            );
+
+                            ?>
+
+                        </h3>
+
+
+                        <a
+                            href="hirebooking.php?provider_id=<?php echo $provider_id; ?>"
+                            class="btn"
+                        >
+
+                            <i class="fas fa-calendar-check"></i>
+
+                            Book This Provider
+
+                        </a>
+
+
+                    </div>
+
+                <?php endwhile; ?>
+
+
+            <?php else: ?>
+
+
+                <p>
+                    This provider has not added any services yet.
+                </p>
+
+
+            <?php endif; ?>
+
+        </div>
+
+
+
+        <!-- REVIEWS -->
+
+        <div class="profile-card">
+
+            <h2>
+
+                <i class="fas fa-star"></i>
+
+                Customer Reviews
+
+            </h2>
+
+
+            <?php if ($reviews->num_rows > 0): ?>
+
+
+                <?php while ($review = $reviews->fetch_assoc()): ?>
+
+
+                    <div class="review-card">
+
+                        <h3>
+
+                            <?php
+                            echo htmlspecialchars(
+                                $review["customer_name"]
+                            );
+                            ?>
+
+                        </h3>
+
+
+                        <p>
+
+                            <?php
+
+                            for (
+                                $i = 1;
+                                $i <= 5;
+                                $i++
+                            ) {
+
+                                if (
+                                    $i <= $review["rating"]
+                                ) {
 
                                     echo "⭐";
 
@@ -342,6 +518,7 @@ if ($average_rating !== null) {
                         <?php if (!empty($review["comment"])): ?>
 
                             <p>
+
                                 <?php
                                 echo nl2br(
                                     htmlspecialchars(
@@ -349,6 +526,7 @@ if ($average_rating !== null) {
                                     )
                                 );
                                 ?>
+
                             </p>
 
                         <?php else: ?>
@@ -363,10 +541,13 @@ if ($average_rating !== null) {
                         <small>
 
                             Reviewed on
+
                             <?php
                             echo date(
                                 "F j, Y",
-                                strtotime($review["created_at"])
+                                strtotime(
+                                    $review["created_at"]
+                                )
                             );
                             ?>
 
@@ -374,21 +555,22 @@ if ($average_rating !== null) {
 
                     </div>
 
+
                 <?php endwhile; ?>
+
 
             <?php else: ?>
 
-                <div class="review-card">
 
-                    <p>
-                        This provider has no reviews yet.
-                    </p>
+                <p>
+                    No reviews yet.
+                </p>
 
-                </div>
 
             <?php endif; ?>
 
         </div>
+
 
     </main>
 
@@ -399,6 +581,8 @@ if ($average_rating !== null) {
 </html>
 
 <?php
+
 $stmt->close();
 $conn->close();
+
 ?>
