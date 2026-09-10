@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Messages | SkillConnect</title>
+
+<link rel="stylesheet" href="dashboard.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="dashboard">
+
+
+
+<aside class="sidebar">
+
+<div class="logo">
+<h2>skill connect</h2>
+</div>
+
+<ul>
+
+<li>
+<a href="customer-dashboard.html">
+<i class="fas fa-home"></i>
+Dashboard
+</a>
+</li>
+
+<li>
+<a href="search-results.html">
+<i class="fas fa-search"></i>
+Find Providers
+</a>
+</li>
+
+<li>
+<a href="hire-booking.html">
+<i class="fas fa-calendar-check"></i>
+Bookings
+</a>
+</li>
+
+<li class="active">
+<a href="message.html">
+<i class="fas fa-comments"></i>
+Messages
+</a>
+</li>
+
+<li>
+<a href="settings.html">
+<i class="fas fa-cog"></i>
+Settings
+</a>
+</li>
+
+<li>
+<a href="logout.html">
+<i class="fas fa-sign-out-alt"></i>
+Logout
+</a>
+</li>
+
+</ul>
+
+</aside>
+
+
+<main class="content">
+
+<header class="topbar">
+
+<div>
+
+<h1>Messages</h1>
+
+<p>Chat with customers and service providers.</p>
+
+</div>
+
+<div class="profile">
+
+<img src="images/default-user.png" alt="Profile">
+
+<span>John Doe</span>
+
+</div>
+
+</header>
+
+<div style="display:flex;
+background:white;
+height:700px;
+border-radius:15px;
+overflow:hidden;
+box-shadow:0 5px 15px rgba(0,0,0,.08);">
+
+<!-- ======================
+CHAT LIST
+====================== -->
+
+<div style="width:32%;
+border-right:1px solid #eee;
+display:flex;
+flex-direction:column;">
+
+<div style="padding:20px;">
+
+<input
+type="text"
+placeholder="Search conversations..."
+style="width:100%;
+padding:12px;
+border:1px solid #ddd;
+border-radius:8px;">
+
+</div>
+
+<div style="overflow-y:auto;">
+
+<div style="display:flex;
+align-items:center;
+gap:15px;
+padding:18px;
+cursor:pointer;
+background:#f8f8f8;">
+
+<img src="images/provider1.jpg"
+style="width:55px;
+height:55px;
+border-radius:50%;">
+
+<div>
+
+<h4>David Wilson</h4>
+
+<p>I'll arrive tomorrow morning.</p>
+
+</div>
+
+</div>
+
+<div style="display:flex;
+align-items:center;
+gap:15px;
+padding:18px;
+cursor:pointer;">
+
+<img src="images/provider2.jpg"
+style="width:55px;
+height:55px;
+border-radius:50%;">
+
+<div>
+
+<h4>Grace Adams</h4>
+
+<p>Thank you for your booking.</p>
+
+</div>
+
+</div>
+
+<div style="display:flex;
+align-items:center;
+gap:15px;
+padding:18px;
+cursor:pointer;">
+
+<img src="images/provider3.jpg"
+style="width:55px;
+height:55px;
+border-radius:50%;">
+
+<div>
+
+<h4>Michael James</h4>
+
+<p>Can you send more details?</p>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- =====================
+CHAT AREA
+===================== -->
+
+<div style="flex:1;
+display:flex;
+flex-direction:column;">
+
+<!-- Header -->
+
+<div style="padding:20px;
+border-bottom:1px solid #eee;
+display:flex;
+align-items:center;
+gap:15px;">
+
+<img src="images/provider1.jpg"
+style="width:60px;
+height:60px;
+border-radius:50%;">
+
+<div>
+
+<h3>David Wilson</h3>
+
+<p style="color:green;">● Online</p>
+
+</div>
+
+</div>
+
+<!-- Messages -->
+
+<div style="flex:1;
+padding:25px;
+overflow-y:auto;
+background:#f7f7f7;">
+
+<div style="background:white;
+padding:15px;
+border-radius:12px;
+width:320px;
+margin-bottom:20px;">
+
+Hello John.
+
+Thanks for choosing my service.
+
+</div>
+
+<div style="background:#0d6efd;
+color:white;
+padding:15px;
+border-radius:12px;
+width:320px;
+margin-left:auto;
+margin-bottom:20px;">
+
+You're welcome.
+
+What time will you arrive?
+
+</div>
+
+<div style="background:white;
+padding:15px;
+border-radius:12px;
+width:320px;">
+
+Around 10:00 AM tomorrow.
+
+</div>
+
+</div>
+
+<!-- Message Input -->
+
+<div style="padding:20px;
+border-top:1px solid #eee;
+display:flex;
+gap:15px;">
+
+<button class="btn"
+style="width:60px;">
+
+<i class="fas fa-paperclip"></i>
+
+</button>
+
+<input
+type="text"
+placeholder="Type your message..."
+style="flex:1;
+padding:15px;
+border:1px solid #ddd;
+border-radius:8px;">
+
+<button class="btn"
+style="width:80px;">
+
+<i class="fas fa-paper-plane"></i>
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</main>
+
+</div>
+
+<script src="js/main.js"></script>
+
+</body>
+</html>

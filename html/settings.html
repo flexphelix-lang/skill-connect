@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Settings | SkillConnect</title>
+
+<link rel="stylesheet" href="dashboard.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="dashboard">
+
+
+
+<aside class="sidebar">
+
+<div class="logo">
+<h2>skill connect</h2>
+</div>
+
+<ul>
+
+<li>
+<a href="customer-dashboard.html">
+<i class="fas fa-home"></i>
+Dashboard
+</a>
+</li>
+
+<li>
+<a href="search-results.html">
+<i class="fas fa-search"></i>
+Find Providers
+</a>
+</li>
+
+<li>
+<a href="hire-booking.html">
+<i class="fas fa-calendar-check"></i>
+Bookings
+</a>
+</li>
+
+<li>
+<a href="message.html">
+<i class="fas fa-comments"></i>
+Messages
+</a>
+</li>
+
+<li class="active">
+<a href="settings.html">
+<i class="fas fa-cog"></i>
+Settings
+</a>
+</li>
+
+<li>
+<a href="logout.html">
+<i class="fas fa-sign-out-alt"></i>
+Logout
+</a>
+</li>
+
+</ul>
+
+</aside>
+
+
+
+<main class="content">
+
+<header class="topbar">
+
+<div>
+
+<h1>Account Settings</h1>
+
+<p>Manage your profile, security, and preferences.</p>
+
+</div>
+
+<div class="profile">
+
+<img src="images/default-user.png">
+
+<span>John Doe</span>
+
+</div>
+
+</header>
+
+
+
+<section class="table-section">
+
+<h2>Profile Information</h2>
+
+<form>
+
+<div class="cards">
+
+<div class="card">
+
+<label>Full Name</label><br><br>
+
+<input type="text"
+value="John Doe"
+style="width:100%;padding:12px;">
+
+</div>
+
+<div class="card">
+
+<label>Email Address</label><br><br>
+
+<input type="email"
+value="john@email.com"
+style="width:100%;padding:12px;">
+
+</div>
+
+<div class="card">
+
+<label>Phone Number</label><br><br>
+
+<input type="text"
+value="+2348001234567"
+style="width:100%;padding:12px;">
+
+</div>
+
+<div class="card">
+
+<label>Location</label><br><br>
+
+<input type="text"
+value="Lagos, Nigeria"
+style="width:100%;padding:12px;">
+
+</div>
+
+</div>
+
+<br>
+
+<button class="btn">
+
+Save Profile
+
+</button>
+
+</form>
+
+</section>
+
+
+
+<section class="table-section">
+
+<h2>Change Password</h2>
+
+<form>
+
+<input
+type="password"
+placeholder="Current Password"
+style="width:100%;padding:15px;margin-bottom:15px;">
+
+<input
+type="password"
+placeholder="New Password"
+style="width:100%;padding:15px;margin-bottom:15px;">
+
+<input
+type="password"
+placeholder="Confirm New Password"
+style="width:100%;padding:15px;">
+
+<br><br>
+
+<button class="btn">
+
+Update Password
+
+</button>
+
+</form>
+
+</section>
+
+
+<section class="table-section">
+
+<h2>Notification Preferences</h2>
+
+<table>
+
+<tr>
+
+<td>Email Notifications</td>
+
+<td><input type="checkbox" checked></td>
+
+</tr>
+
+<tr>
+
+<td>SMS Notifications</td>
+
+<td><input type="checkbox"></td>
+
+</tr>
+
+<tr>
+
+<td>Job Updates</td>
+
+<td><input type="checkbox" checked></td>
+
+</tr>
+
+<tr>
+
+<td>Marketing Emails</td>
+
+<td><input type="checkbox"></td>
+
+</tr>
+
+</table>
+
+</section>
+
+
+
+<section class="table-section">
+
+<h2>Account Management</h2>
+
+<div style="display:flex;gap:20px;flex-wrap:wrap;">
+
+<button class="btn">
+
+<i class="fas fa-upload"></i>
+
+Upload Profile Picture
+
+</button>
+
+<button class="btn"
+style="background:#198754;">
+
+<i class="fas fa-download"></i>
+
+Download My Data
+
+</button>
+
+<button class="btn"
+style="background:#dc3545;">
+
+<i class="fas fa-trash"></i>
+
+Delete Account
+
+</button>
+
+</div>
+
+</section>
+
+
+
+<section class="cards">
+
+<div class="card">
+
+<i class="fas fa-user-shield"></i>
+
+<h3>Account Status</h3>
+
+<p>Verified</p>
+
+</div>
+
+<div class="card">
+
+<i class="fas fa-lock"></i>
+
+<h3>Two-Factor Authentication</h3>
+
+<p>Disabled</p>
+
+</div>
+
+<div class="card">
+
+<i class="fas fa-clock"></i>
+
+<h3>Last Login</h3>
+
+<p>Today - 8:30 AM</p>
+
+</div>
+
+<div class="card">
+
+<i class="fas fa-globe"></i>
+
+<h3>Language</h3>
+
+<p>English</p>
+
+</div>
+
+</section>
+
+</main>
+
+</div>
+
+<script src="js/main.js"></script>
+
+</body>
+
+</html>
