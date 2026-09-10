@@ -402,8 +402,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <?php while ($service = $services->fetch_assoc()): ?>
 
                                 <option
-                                    value="<?php echo $service["id"]; ?>"
-                                >
+    value="<?php echo $service["id"]; ?>"
+    <?php echo ($service["id"] == $selected_service_id) ? "selected" : ""; ?>
+>
 
                                     <?php
                                     echo htmlspecialchars(
