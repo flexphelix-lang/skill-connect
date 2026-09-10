@@ -9,42 +9,34 @@ if ($_SESSION["role"] != "admin") {
 }
 
 
-// Delete user
-if (isset($_GET["delete"]) && is_numeric($_GET["delete"])) {
-
-    $user_id = intval($_GET["delete"]);
-
-    // Don't allow admin to delete their own account
-    if ($user_id != $_SESSION["user_id"]) {
-
-        $stmt = $conn->prepare("
-            DELETE FROM users
-            WHERE id = ?
-        ");
-
-        $stmt->bind_param("i", $user_id);
-
-        $stmt->execute();
-
-        $stmt->close();
-    }
-
-    header("Location: admin-users.php");
-    exit();
-}
-
-
-// Get all users
-$users = $conn->query("
+// Get all bookings
+$bookings = $conn->query("
     SELECT
-        id,
-        full_name,
-        email,
-        phone,
-        role,
-        created_at
-    FROM users
-    ORDER BY created_at DESC
+        bookings.id,
+        bookings.booking_date,
+        bookings.booking_time,
+        bookings.message,
+        bookings.status,
+        bookings.created_at,
+
+        customer.full_name AS customer_name,
+
+        provider.full_name AS provider_name,
+
+        provider_profiles.skill
+
+    FROM bookings
+
+    INNER JOIN users AS customer
+        ON bookings.customer_id = customer.id
+
+    INNER JOIN users AS provider
+        ON bookings.provider_id = provider.id
+
+    LEFT JOIN provider_profiles
+        ON bookings.provider_id = provider_profiles.user_id
+
+    ORDER BY bookings.created_at DESC
 ");
 
 ?>
@@ -61,7 +53,7 @@ $users = $conn->query("
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Manage Users - JobWalk</title>
+    <title>Manage Bookings - SkillConnect</title>
 
     <link
         rel="stylesheet"
@@ -85,7 +77,7 @@ $users = $conn->query("
 
     <aside class="sidebar">
 
-        <h2>JobWalk</h2>
+        <h2>SkillConnect</h2>
 
         <p>Admin Panel</p>
 
@@ -144,22 +136,22 @@ $users = $conn->query("
     <main class="main-content">
 
         <h1>
-            Manage Users
+            Manage Bookings
         </h1>
 
         <p>
-            View and manage JobWalk users.
+            Monitor all bookings made on SkillConnect.
         </p>
 
 
         <div class="profile-card">
 
             <h2>
-                Registered Users
+                All Bookings
             </h2>
 
 
-            <?php if ($users->num_rows > 0): ?>
+            <?php if ($bookings->num_rows > 0): ?>
 
                 <div style="overflow-x:auto;">
 
@@ -172,39 +164,43 @@ $users = $conn->query("
                             </th>
 
                             <th>
-                                Name
+                                Customer
                             </th>
 
                             <th>
-                                Email
+                                Provider
                             </th>
 
                             <th>
-                                Phone
+                                Skill
                             </th>
 
                             <th>
-                                Role
+                                Date
                             </th>
 
                             <th>
-                                Date Joined
+                                Time
                             </th>
 
                             <th>
-                                Action
+                                Message
+                            </th>
+
+                            <th>
+                                Status
                             </th>
 
                         </tr>
 
 
-                        <?php while ($user = $users->fetch_assoc()): ?>
+                        <?php while ($booking = $bookings->fetch_assoc()): ?>
 
                             <tr>
 
                                 <td>
                                     <?php
-                                    echo $user["id"];
+                                    echo $booking["id"];
                                     ?>
                                 </td>
 
@@ -212,16 +208,7 @@ $users = $conn->query("
                                 <td>
                                     <?php
                                     echo htmlspecialchars(
-                                        $user["full_name"]
-                                    );
-                                    ?>
-                                </td>
-
-
-                                <td>
-                                    <?php
-                                    echo htmlspecialchars(
-                                        $user["email"]
+                                        $booking["customer_name"]
                                     );
                                     ?>
                                 </td>
@@ -230,7 +217,7 @@ $users = $conn->query("
                                 <td>
                                     <?php
                                     echo htmlspecialchars(
-                                        $user["phone"]
+                                        $booking["provider_name"]
                                     );
                                     ?>
                                 </td>
@@ -239,7 +226,7 @@ $users = $conn->query("
                                 <td>
                                     <?php
                                     echo htmlspecialchars(
-                                        $user["role"]
+                                        $booking["skill"] ?? "N/A"
                                     );
                                     ?>
                                 </td>
@@ -247,11 +234,17 @@ $users = $conn->query("
 
                                 <td>
                                     <?php
-                                    echo date(
-                                        "M j, Y",
-                                        strtotime(
-                                            $user["created_at"]
-                                        )
+                                    echo htmlspecialchars(
+                                        $booking["booking_date"]
+                                    );
+                                    ?>
+                                </td>
+
+
+                                <td>
+                                    <?php
+                                    echo htmlspecialchars(
+                                        $booking["booking_time"] ?? "N/A"
                                     );
                                     ?>
                                 </td>
@@ -260,32 +253,53 @@ $users = $conn->query("
                                 <td>
 
                                     <?php
-                                    if (
-                                        $user["id"]
-                                        !=
-                                        $_SESSION["user_id"]
-                                    ):
+
+                                    if (!empty($booking["message"])) {
+
+                                        echo htmlspecialchars(
+                                            $booking["message"]
+                                        );
+
+                                    } else {
+
+                                        echo "No message";
+
+                                    }
+
                                     ?>
 
-                                        <a
-                                            href="admin-users.php?delete=<?php echo $user["id"]; ?>"
-                                            class="btn"
-                                            onclick="return confirm('Are you sure you want to delete this user?');"
-                                        >
+                                </td>
 
-                                            <i class="fas fa-trash"></i>
 
-                                            Delete
+                                <td>
 
-                                        </a>
+                                    <?php
 
-                                    <?php else: ?>
+                                    $status = $booking["status"];
 
-                                        <strong>
-                                            Current Admin
-                                        </strong>
+                                    if ($status == "pending") {
 
-                                    <?php endif; ?>
+                                        echo "⏳ Pending";
+
+                                    } elseif ($status == "accepted") {
+
+                                        echo "✅ Accepted";
+
+                                    } elseif ($status == "completed") {
+
+                                        echo "✔️ Completed";
+
+                                    } elseif ($status == "cancelled") {
+
+                                        echo "❌ Cancelled";
+
+                                    } else {
+
+                                        echo htmlspecialchars($status);
+
+                                    }
+
+                                    ?>
 
                                 </td>
 
@@ -300,7 +314,7 @@ $users = $conn->query("
             <?php else: ?>
 
                 <p>
-                    No users have registered on JobWalk yet.
+                    No bookings have been made on SkillConnect yet.
                 </p>
 
             <?php endif; ?>
@@ -315,6 +329,7 @@ $users = $conn->query("
 </body>
 
 </html>
+
 
 <?php
 
