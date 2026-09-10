@@ -1,254 +1,538 @@
+<?php
+
+require_once "auth.php";
+require_once "db.php";
+
+// Only customers can book providers
+if ($_SESSION["role"] != "customer") {
+    die("Access denied. Customers only.");
+}
+
+
+// Check provider ID
+if (!isset($_GET["provider_id"]) || !is_numeric($_GET["provider_id"])) {
+    die("Invalid provider.");
+}
+
+$provider_id = intval($_GET["provider_id"]);
+
+
+// Get provider information
+$stmt = $conn->prepare("
+    SELECT
+        users.id,
+        users.full_name,
+        provider_profiles.skill,
+        provider_profiles.description,
+        provider_profiles.location
+    FROM users
+    INNER JOIN provider_profiles
+        ON users.id = provider_profiles.user_id
+    WHERE users.id = ?
+      AND users.role = 'provider'
+");
+
+$stmt->bind_param("i", $provider_id);
+$stmt->execute();
+
+$result = $stmt->get_result();
+
+if ($result->num_rows == 0) {
+    die("Provider not found.");
+}
+
+$provider = $result->fetch_assoc();
+
+$stmt->close();
+
+
+// Get provider services
+$stmt = $conn->prepare("
+    SELECT
+        id,
+        service_name,
+        description,
+        price
+    FROM services
+    WHERE provider_id = ?
+    ORDER BY service_name ASC
+");
+
+$stmt->bind_param("i", $provider_id);
+$stmt->execute();
+
+$services = $stmt->get_result();
+
+
+// Booking message
+$message = "";
+$error = "";
+
+
+// Handle booking
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    $service_id = $_POST["service_id"] ?? "";
+    $booking_date = $_POST["booking_date"] ?? "";
+    $booking_time = $_POST["booking_time"] ?? "";
+    $booking_message = trim($_POST["message"] ?? "");
+
+
+    // Check required information
+    if (
+        !is_numeric($service_id) ||
+        $booking_date == "" ||
+        $booking_time == ""
+    ) {
+
+        $error = "Please select a service, date and time.";
+
+    } else {
+
+        $service_id = intval($service_id);
+
+
+        // Check that selected service belongs to this provider
+        $check = $conn->prepare("
+            SELECT id
+            FROM services
+            WHERE id = ?
+              AND provider_id = ?
+        ");
+
+        $check->bind_param(
+            "ii",
+            $service_id,
+            $provider_id
+        );
+
+        $check->execute();
+
+        $service_result = $check->get_result();
+
+
+        if ($service_result->num_rows == 0) {
+
+            $error = "Invalid service selected.";
+
+        } else {
+
+            // Insert booking
+            $customer_id = $_SESSION["user_id"];
+
+            $insert = $conn->prepare("
+                INSERT INTO bookings
+                (
+                    customer_id,
+                    provider_id,
+                    service_id,
+                    booking_date,
+                    booking_time,
+                    message
+                )
+                VALUES (?, ?, ?, ?, ?, ?)
+            ");
+
+            $insert->bind_param(
+                "iiisss",
+                $customer_id,
+                $provider_id,
+                $service_id,
+                $booking_date,
+                $booking_time,
+                $booking_message
+            );
+
+
+            if ($insert->execute()) {
+
+                $message = "Booking submitted successfully.";
+
+            } else {
+
+                $error = "Something went wrong. Please try again.";
+
+            }
+
+            $insert->close();
+        }
+
+        $check->close();
+    }
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-<title>Hire Provider | SkillConnect</title>
+    <title>
+        Hire <?php echo htmlspecialchars($provider["full_name"]); ?>
+        - SkillConnect
+    </title>
 
-<link rel="stylesheet" href="css/dashboard.css">
+    <link
+        rel="stylesheet"
+        href="../css/dashboard.css"
+    >
 
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    >
 
 </head>
 
+
 <body>
 
-<div class="dashboard">
+<div class="dashboard-container">
 
-<!-- SIDEBAR -->
 
-<aside class="sidebar">
+    <!-- SIDEBAR -->
 
-<div class="logo">
-<h2></h2>
+    <aside class="sidebar">
+
+        <h2>SkillConnect</h2>
+
+        <p>Customer Dashboard</p>
+
+
+        <nav>
+
+            <a href="customer-dashboard.php">
+                <i class="fas fa-home"></i>
+                Dashboard
+            </a>
+
+
+            <a href="search-results.php">
+                <i class="fas fa-search"></i>
+                Search
+            </a>
+
+
+            <a href="my-bookings.php">
+                <i class="fas fa-calendar"></i>
+                My Bookings
+            </a>
+
+
+            <a href="messages.php">
+                <i class="fas fa-comments"></i>
+                Messages
+            </a>
+
+
+            <a href="settings.php">
+                <i class="fas fa-cog"></i>
+                Settings
+            </a>
+
+
+            <a href="logout.php">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="main-content">
+
+
+        <a
+            href="view-provider.php?id=<?php echo $provider_id; ?>"
+            class="btn"
+        >
+
+            <i class="fas fa-arrow-left"></i>
+
+            Back to Provider
+
+        </a>
+
+
+        <div class="profile-card">
+
+            <h1>
+                Hire
+                <?php echo htmlspecialchars($provider["full_name"]); ?>
+            </h1>
+
+
+            <p>
+
+                <strong>Skill:</strong>
+
+                <?php
+                echo htmlspecialchars(
+                    $provider["skill"]
+                );
+                ?>
+
+            </p>
+
+
+            <p>
+
+                <strong>Location:</strong>
+
+                <?php
+                echo htmlspecialchars(
+                    $provider["location"]
+                );
+                ?>
+
+            </p>
+
+
+            <p>
+
+                <?php
+                echo nl2br(
+                    htmlspecialchars(
+                        $provider["description"]
+                    )
+                );
+                ?>
+
+            </p>
+
+        </div>
+
+
+
+        <!-- SUCCESS MESSAGE -->
+
+        <?php if ($message != ""): ?>
+
+            <div class="profile-card">
+
+                <p>
+                    ✅
+                    <?php echo htmlspecialchars($message); ?>
+                </p>
+
+
+                <a
+                    href="my-bookings.php"
+                    class="btn"
+                >
+
+                    View My Bookings
+
+                </a>
+
+            </div>
+
+        <?php endif; ?>
+
+
+
+        <!-- ERROR MESSAGE -->
+
+        <?php if ($error != ""): ?>
+
+            <div class="profile-card">
+
+                <p>
+                    ❌
+                    <?php echo htmlspecialchars($error); ?>
+                </p>
+
+            </div>
+
+        <?php endif; ?>
+
+
+
+        <!-- BOOKING FORM -->
+
+        <?php if ($services->num_rows > 0): ?>
+
+            <div class="profile-card">
+
+                <h2>
+                    Book a Service
+                </h2>
+
+
+                <form method="POST">
+
+
+                    <!-- SERVICE -->
+
+                    <div class="input-group">
+
+                        <label>
+                            Select Service
+                        </label>
+
+
+                        <select
+                            name="service_id"
+                            required
+                        >
+
+                            <option value="">
+                                -- Select a Service --
+                            </option>
+
+
+                            <?php while ($service = $services->fetch_assoc()): ?>
+
+                                <option
+                                    value="<?php echo $service["id"]; ?>"
+                                >
+
+                                    <?php
+                                    echo htmlspecialchars(
+                                        $service["service_name"]
+                                    );
+                                    ?>
+
+                                    -
+                                    ₦<?php
+                                    echo number_format(
+                                        $service["price"],
+                                        2
+                                    );
+                                    ?>
+
+                                </option>
+
+                            <?php endwhile; ?>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <!-- DATE -->
+
+                    <div class="input-group">
+
+                        <label>
+                            Booking Date
+                        </label>
+
+
+                        <input
+                            type="date"
+                            name="booking_date"
+                            min="<?php echo date("Y-m-d"); ?>"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <!-- TIME -->
+
+                    <div class="input-group">
+
+                        <label>
+                            Booking Time
+                        </label>
+
+
+                        <input
+                            type="time"
+                            name="booking_time"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <!-- MESSAGE -->
+
+                    <div class="input-group">
+
+                        <label>
+                            Message to Provider
+                        </label>
+
+
+                        <textarea
+                            name="message"
+                            rows="5"
+                            placeholder="Tell the provider what you need..."
+                        ></textarea>
+
+                    </div>
+
+
+
+                    <!-- SUBMIT -->
+
+                    <button
+                        type="submit"
+                        class="btn"
+                    >
+
+                        <i class="fas fa-calendar-check"></i>
+
+                        Submit Booking
+
+                    </button>
+
+
+                </form>
+
+            </div>
+
+
+        <?php else: ?>
+
+
+            <div class="profile-card">
+
+                <h2>
+                    No Services Available
+                </h2>
+
+
+                <p>
+                    This provider has not added any services yet.
+                </p>
+
+
+            </div>
+
+
+        <?php endif; ?>
+
+
+    </main>
+
 </div>
-
-<ul>
-
-<li>
-<a href="customer-dashboard.php">
-<i class="fas fa-home"></i>
-Dashboard
-</a>
-</li>
-
-<li>
-<a href="search-results.php">
-<i class="fas fa-search"></i>
-Find Providers
-</a>
-</li>
-
-<li class="active">
-<a href="hire-booking.php">
-<i class="fas fa-calendar-check"></i>
-Book Service
-</a>
-</li>
-
-<li>
-<a href="messages.php">
-<i class="fas fa-comments"></i>
-Messages
-</a>
-</li>
-
-<li>
-<a href="settings.php">
-<i class="fas fa-cog"></i>
-Settings
-</a>
-</li>
-
-<li>
-<a href="logout.php">
-<i class="fas fa-sign-out-alt"></i>
-Logout
-</a>
-</li>
-
-</ul>
-
-</aside>
-
-<!-- MAIN -->
-
-<main class="content">
-
-<header class="topbar">
-
-<div>
-
-<h1>Hire a Professional</h1>
-
-<p>Complete the booking form below.</p>
-
-</div>
-
-</header>
-
-<section class="table-section">
-
-<h2>Provider Information</h2>
-
-<div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
-
-<img src="images/provider1.jpg"
-style="width:120px;height:120px;border-radius:50%;object-fit:cover;">
-
-<div>
-
-<h3>David Wilson</h3>
-
-<p>Master Electrician</p>
-
-<p>⭐⭐⭐⭐⭐ 4.9 Rating</p>
-
-<p>₦8,000 per hour</p>
-
-</div>
-
-</div>
-
-</section>
-
-<section class="table-section">
-
-<h2>Booking Details</h2>
-
-<form action="process-booking.php" method="POST">
-
-<div class="cards">
-
-<div class="card">
-
-<label>Service Required</label><br><br>
-
-<select style="width:100%;padding:12px;">
-
-<option>Electrical Installation</option>
-
-<option>Generator Repair</option>
-
-<option>Solar Installation</option>
-
-<option>Maintenance</option>
-
-</select>
-
-</div>
-
-<div class="card">
-
-<label>Budget</label><br><br>
-
-<input type="number"
-placeholder="Enter Budget"
-style="width:100%;padding:12px;">
-
-</div>
-
-<div class="card">
-
-<label>Preferred Date</label><br><br>
-
-<input type="date"
-style="width:100%;padding:12px;">
-
-</div>
-
-<div class="card">
-
-<label>Preferred Time</label><br><br>
-
-<input type="time"
-style="width:100%;padding:12px;">
-
-</div>
-
-</div>
-
-<br>
-
-<label>Service Address</label>
-
-<input
-type="text"
-placeholder="Enter your address"
-style="width:100%;padding:15px;margin-top:10px;margin-bottom:20px;">
-
-<label>Describe the Job</label>
-
-<textarea
-rows="7"
-placeholder="Describe the work you need..."
-style="width:100%;padding:15px;"></textarea>
-
-<br><br>
-
-<button class="btn">
-
-Submit Booking Request
-
-</button>
-
-</form>
-
-</section>
-
-<section class="table-section">
-
-<h2>Booking Summary</h2>
-
-<table>
-
-<tr>
-
-<td>Provider</td>
-
-<td>David Wilson</td>
-
-</tr>
-
-<tr>
-
-<td>Hourly Rate</td>
-
-<td>₦8,000</td>
-
-</tr>
-
-<tr>
-
-<td>Estimated Hours</td>
-
-<td>5 Hours</td>
-
-</tr>
-
-<tr>
-
-<td>Estimated Cost</td>
-
-<td><strong>₦40,000</strong></td>
-
-</tr>
-
-</table>
-
-</section>
-
-</main>
-
-</div>
-
-<script src="js/main.js"></script>
 
 </body>
 
 </html>
+
+<?php
+
+$stmt->close();
+$conn->close();
+
+?>
