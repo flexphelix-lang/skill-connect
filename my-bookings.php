@@ -4,16 +4,16 @@ require_once "auth.php";
 require_once "db.php";
 
 // Only customers can access this page
-if ($_SESSION["role"] !== "customer") {
-    header("Location: provider-dashboard.php");
-    exit();
+if ($_SESSION["role"] != "customer") {
+    die("Access denied. Customers only.");
 }
 
 $customer_id = $_SESSION["user_id"];
 
+
 // Get customer's bookings
-$stmt = $conn->prepare(
-    "SELECT
+$stmt = $conn->prepare("
+    SELECT
         bookings.id,
         bookings.provider_id,
         bookings.booking_date,
@@ -26,7 +26,10 @@ $stmt = $conn->prepare(
 
         provider_profiles.skill,
         provider_profiles.location,
-        provider_profiles.price
+
+        services.service_name,
+        services.description AS service_description,
+        services.price AS service_price
 
     FROM bookings
 
@@ -36,16 +39,18 @@ $stmt = $conn->prepare(
     LEFT JOIN provider_profiles
         ON bookings.provider_id = provider_profiles.user_id
 
+    LEFT JOIN services
+        ON bookings.service_id = services.id
+
     WHERE bookings.customer_id = ?
 
-    ORDER BY bookings.created_at DESC"
-);
+    ORDER BY bookings.created_at DESC
+");
 
 $stmt->bind_param("i", $customer_id);
-
 $stmt->execute();
 
-$result = $stmt->get_result();
+$bookings = $stmt->get_result();
 
 ?>
 
@@ -61,7 +66,7 @@ $result = $stmt->get_result();
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>My Bookings | JobWalk</title>
+    <title>My Bookings - SkillConnect</title>
 
     <link
         rel="stylesheet"
@@ -70,7 +75,7 @@ $result = $stmt->get_result();
 
     <link
         rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     >
 
 </head>
@@ -78,101 +83,56 @@ $result = $stmt->get_result();
 
 <body>
 
-
-<div class="dashboard">
+<div class="dashboard-container">
 
 
     <!-- SIDEBAR -->
 
     <aside class="sidebar">
 
-        <div class="logo">
+        <h2>SkillConnect</h2>
 
-            <h2>JobWalk</h2>
-
-        </div>
+        <p>Customer Dashboard</p>
 
 
-        <ul>
+        <nav>
 
-            <li>
-
-                <a href="customer-dashboard.php">
-
-                    <i class="fas fa-home"></i>
-
-                    Dashboard
-
-                </a>
-
-            </li>
+            <a href="customer-dashboard.php">
+                <i class="fas fa-home"></i>
+                Dashboard
+            </a>
 
 
-            <li>
-
-                <a href="search-results.php">
-
-                    <i class="fas fa-search"></i>
-
-                    Find Providers
-
-                </a>
-
-            </li>
+            <a href="search-results.php">
+                <i class="fas fa-search"></i>
+                Search
+            </a>
 
 
-            <li class="active">
-
-                <a href="my-bookings.php">
-
-                    <i class="fas fa-calendar-check"></i>
-
-                    My Bookings
-
-                </a>
-
-            </li>
+            <a href="my-bookings.php">
+                <i class="fas fa-calendar"></i>
+                My Bookings
+            </a>
 
 
-            <li>
-
-                <a href="messages.php">
-
-                    <i class="fas fa-comments"></i>
-
-                    Messages
-
-                </a>
-
-            </li>
+            <a href="messages.php">
+                <i class="fas fa-comments"></i>
+                Messages
+            </a>
 
 
-            <li>
-
-                <a href="settings.php">
-
-                    <i class="fas fa-cog"></i>
-
-                    Settings
-
-                </a>
-
-            </li>
+            <a href="settings.php">
+                <i class="fas fa-cog"></i>
+                Settings
+            </a>
 
 
-            <li>
+            <a href="logout.php">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </a>
 
-                <a href="logout.php">
-
-                    <i class="fas fa-sign-out-alt"></i>
-
-                    Logout
-
-                </a>
-
-            </li>
-
-        </ul>
+        </nav>
 
     </aside>
 
@@ -180,35 +140,27 @@ $result = $stmt->get_result();
 
     <!-- MAIN CONTENT -->
 
-    <main class="content">
+    <main class="main-content">
+
+        <h1>
+            My Bookings
+        </h1>
+
+        <p>
+            View and track your SkillConnect bookings.
+        </p>
 
 
-        <header class="topbar">
-
-            <div>
-
-                <h1>My Bookings</h1>
-
-                <p>
-                    View and track your service requests.
-                </p>
-
-            </div>
-
-        </header>
+        <?php if ($bookings->num_rows > 0): ?>
 
 
-
-        <!-- BOOKINGS -->
-
-        <?php if ($result->num_rows > 0): ?>
+            <?php while ($booking = $bookings->fetch_assoc()): ?>
 
 
-            <?php while ($booking = $result->fetch_assoc()): ?>
+                <div class="profile-card">
 
 
-                <section class="card">
-
+                    <!-- PROVIDER -->
 
                     <h2>
 
@@ -221,49 +173,102 @@ $result = $stmt->get_result();
                     </h2>
 
 
+                    <!-- SERVICE -->
+
                     <p>
 
-                        <strong>Service:</strong>
+                        <strong>
+                            Service:
+                        </strong>
+
+                        <?php
+
+                        if (!empty($booking["service_name"])) {
+
+                            echo htmlspecialchars(
+                                $booking["service_name"]
+                            );
+
+                        } else {
+
+                            echo "Service not specified";
+
+                        }
+
+                        ?>
+
+                    </p>
+
+
+                    <!-- SERVICE PRICE -->
+
+                    <p>
+
+                        <strong>
+                            Price:
+                        </strong>
+
+                        <?php
+
+                        if ($booking["service_price"] !== null) {
+
+                            echo "₦" . number_format(
+                                $booking["service_price"],
+                                2
+                            );
+
+                        } else {
+
+                            echo "Price not available";
+
+                        }
+
+                        ?>
+
+                    </p>
+
+
+                    <!-- SKILL -->
+
+                    <p>
+
+                        <strong>
+                            Provider Skill:
+                        </strong>
 
                         <?php
                         echo htmlspecialchars(
-                            $booking["skill"]
+                            $booking["skill"] ?? "N/A"
                         );
                         ?>
 
                     </p>
 
 
+                    <!-- LOCATION -->
+
                     <p>
 
-                        <strong>Location:</strong>
+                        <strong>
+                            Location:
+                        </strong>
 
                         <?php
                         echo htmlspecialchars(
-                            $booking["location"]
+                            $booking["location"] ?? "N/A"
                         );
                         ?>
 
                     </p>
 
 
-                    <p>
-
-                        <strong>Price:</strong>
-
-                        ₦<?php
-                        echo number_format(
-                            $booking["price"],
-                            2
-                        );
-                        ?>
-
-                    </p>
-
+                    <!-- DATE -->
 
                     <p>
 
-                        <strong>Booking Date:</strong>
+                        <strong>
+                            Booking Date:
+                        </strong>
 
                         <?php
                         echo htmlspecialchars(
@@ -274,103 +279,146 @@ $result = $stmt->get_result();
                     </p>
 
 
+                    <!-- TIME -->
+
                     <p>
 
-                        <strong>Booking Time:</strong>
+                        <strong>
+                            Booking Time:
+                        </strong>
 
                         <?php
                         echo htmlspecialchars(
-                            $booking["booking_time"]
+                            $booking["booking_time"] ?? "N/A"
                         );
                         ?>
 
                     </p>
 
 
+                    <!-- MESSAGE -->
+
                     <p>
 
-                        <strong>Your Message:</strong>
+                        <strong>
+                            Your Message:
+                        </strong>
 
                     </p>
 
 
-                    <p>
-
-                        <?php
-                        echo nl2br(
-                            htmlspecialchars(
-                                $booking["message"]
-                            )
-                        );
-                        ?>
-
-                    </p>
-
-
-                    <p>
-
-                        <strong>Status:</strong>
-
-                        <?php
-                        echo htmlspecialchars(
-                            ucfirst($booking["status"])
-                        );
-                        ?>
-
-                    </p>
-
-
-
-                    <!-- PENDING -->
-
-                    <?php if ($booking["status"] === "pending"): ?>
+                    <?php if (!empty($booking["message"])): ?>
 
                         <p>
-                            ⏳ Waiting for the provider to respond.
+
+                            <?php
+                            echo nl2br(
+                                htmlspecialchars(
+                                    $booking["message"]
+                                )
+                            );
+                            ?>
+
                         </p>
 
-
-                    <!-- ACCEPTED -->
-
-                    <?php elseif ($booking["status"] === "accepted"): ?>
+                    <?php else: ?>
 
                         <p>
-                            ✅ Your booking has been accepted!
+                            No message provided.
                         </p>
-
-
-                    <!-- CANCELLED -->
-
-                    <?php elseif ($booking["status"] === "cancelled"): ?>
-
-                        <p>
-                            ❌ This booking was cancelled.
-                        </p>
-
-
-                    <!-- COMPLETED -->
-
-                    <?php elseif ($booking["status"] === "completed"): ?>
-
-                        <p>
-                            🎉 This job has been completed.
-                        </p>
-
-                        <br>
-
-                        <a
-                            href="review.php?provider_id=<?php echo $booking["provider_id"]; ?>"
-                            class="btn"
-                        >
-
-                            ⭐ Leave a Review
-
-                        </a>
 
                     <?php endif; ?>
 
 
-                </section>
+                    <!-- STATUS -->
+
+                    <p>
+
+                        <strong>
+                            Status:
+                        </strong>
+
+
+                        <?php
+
+                        if ($booking["status"] == "pending") {
+
+                            echo "⏳ Pending";
+
+                        } elseif ($booking["status"] == "accepted") {
+
+                            echo "✅ Accepted";
+
+                        } elseif ($booking["status"] == "completed") {
+
+                            echo "✔️ Completed";
+
+                        } elseif ($booking["status"] == "cancelled") {
+
+                            echo "❌ Cancelled";
+
+                        } else {
+
+                            echo htmlspecialchars(
+                                $booking["status"]
+                            );
+
+                        }
+
+                        ?>
+
+                    </p>
+
+
+                    <!-- ACTIONS -->
+
+                    <div class="profile-actions">
+
+
+                        <a
+                            href="view-provider.php?id=<?php echo $booking["provider_id"]; ?>"
+                            class="btn"
+                        >
+
+                            <i class="fas fa-user"></i>
+
+                            View Provider
+
+                        </a>
+
+
+
+                        <a
+                            href="messages.php?user_id=<?php echo $booking["provider_id"]; ?>"
+                            class="btn"
+                        >
+
+                            <i class="fas fa-comment"></i>
+
+                            Message Provider
+
+                        </a>
+
+
+
+                        <?php if ($booking["status"] == "completed"): ?>
+
+                            <a
+                                href="review.php?provider_id=<?php echo $booking["provider_id"]; ?>"
+                                class="btn"
+                            >
+
+                                ⭐ Leave a Review
+
+                            </a>
+
+                        <?php endif; ?>
+
+
+                    </div>
+
+
+                </div>
 
 
             <?php endwhile; ?>
@@ -379,17 +427,17 @@ $result = $stmt->get_result();
         <?php else: ?>
 
 
-            <!-- NO BOOKINGS -->
+            <div class="profile-card">
 
-            <section class="card">
+                <h2>
+                    No Bookings Yet
+                </h2>
 
-                <h2>No Bookings Yet</h2>
 
                 <p>
-                    You haven't booked a provider yet.
+                    You have not booked a service on SkillConnect yet.
                 </p>
 
-                <br>
 
                 <a
                     href="search-results.php"
@@ -402,7 +450,7 @@ $result = $stmt->get_result();
 
                 </a>
 
-            </section>
+            </div>
 
 
         <?php endif; ?>
@@ -412,9 +460,14 @@ $result = $stmt->get_result();
 
 </div>
 
-
-<script src="../js/main.js"></script>
-
 </body>
 
 </html>
+
+
+<?php
+
+$stmt->close();
+$conn->close();
+
+?>
