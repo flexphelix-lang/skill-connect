@@ -15,6 +15,11 @@ if (!isset($_GET["provider_id"]) || !is_numeric($_GET["provider_id"])) {
 }
 
 $provider_id = intval($_GET["provider_id"]);
+$selected_service_id = 0;
+
+if (isset($_GET["service_id"]) && is_numeric($_GET["service_id"])) {
+    $selected_service_id = intval($_GET["service_id"]);
+}
 
 
 // Get provider information
