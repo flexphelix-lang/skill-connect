@@ -424,15 +424,12 @@ $reviews = $stmt->get_result();
 
 
                         <a
-                            href="hirebooking.php?provider_id=<?php echo $provider_id; ?>"
-                            class="btn"
-                        >
-
-                            <i class="fas fa-calendar-check"></i>
-
-                            Book This Provider
-
-                        </a>
+    href="hirebooking.php?provider_id=<?php echo $provider_id; ?>&service_id=<?php echo $service['id']; ?>"
+    class="btn"
+>
+    <i class="fas fa-calendar-check"></i>
+    Book This Service
+</a>
 
 
                     </div>
