@@ -407,10 +407,56 @@ $users_result = $stmt->get_result();
 
         <?php if ($receiver_id !== null): ?>
 
-            <section class="card">
+         <section class="card">
 
-                <h2>Conversation</h2>
+    <h2>
+        <i class="fas fa-comments"></i>
+        Conversation
+    </h2>
 
+    <?php
+    // Get the name of the person we are chatting with
+    $chat_user_name = "User";
+
+    $name_stmt = $conn->prepare(
+        "SELECT full_name FROM users WHERE id = ?"
+    );
+
+    $name_stmt->bind_param(
+        "i",
+        $receiver_id
+    );
+
+    $name_stmt->execute();
+
+    $name_result = $name_stmt->get_result();
+
+    if ($name_row = $name_result->fetch_assoc()) {
+
+        $chat_user_name = $name_row["full_name"];
+
+    }
+
+    $name_stmt->close();
+    ?>
+
+    <div class="chat-header">
+
+        <i class="fas fa-user-circle"></i>
+
+        <div>
+
+            <strong>
+                <?php echo htmlspecialchars($chat_user_name); ?>
+            </strong>
+
+            <small>
+                Chat with this SkillConnect user
+            </small>
+
+        </div>
+
+    </div>
 
                 <?php if (count($conversation) > 0): ?>
 

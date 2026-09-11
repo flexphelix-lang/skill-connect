@@ -487,3 +487,32 @@ table tr:hover{
     margin-bottom: 5px;
     color: #4f46e5;
 }
+/* =========================
+   CHAT HEADER
+========================= */
+
+.chat-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px;
+    margin: 15px 0;
+    background: #f4f7fb;
+    border-radius: 10px;
+}
+
+.chat-header > i {
+    font-size: 35px;
+    color: #4f46e5;
+}
+
+.chat-header strong {
+    display: block;
+    font-size: 18px;
+}
+
+.chat-header small {
+    display: block;
+    margin-top: 4px;
+    color: #777;
+}
