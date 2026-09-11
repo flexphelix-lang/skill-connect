@@ -355,3 +355,35 @@ table tr:hover{
     }
 
 }
+/* =========================
+   CONVERSATION LIST
+========================= */
+
+.conversation-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.conversation-item {
+    display: block;
+    padding: 15px;
+    background: white;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #333;
+    border: 1px solid #eee;
+    transition: 0.2s;
+}
+
+.conversation-item:hover {
+    background: #f4f7fb;
+    border-color: #4f46e5;
+}
+
+.conversation-item strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #4f46e5;
+}
