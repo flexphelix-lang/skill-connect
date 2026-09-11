@@ -145,7 +145,7 @@ $users_result = $stmt->get_result();
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Messages | JobWalk</title>
+    <title>Messages | SkillConnect</title>
 
     <link
         rel="stylesheet"
@@ -172,7 +172,7 @@ $users_result = $stmt->get_result();
 
         <div class="logo">
 
-            <h2>JobWalk</h2>
+            <h2>SkillConnect</h2>
 
         </div>
 
@@ -341,7 +341,7 @@ $users_result = $stmt->get_result();
 
 
 
-        <!-- USERS -->
+        <!-- USERS / CONVERSATIONS -->
 
         <section class="card">
 
@@ -351,34 +351,44 @@ $users_result = $stmt->get_result();
             <?php if ($users_result->num_rows > 0): ?>
 
 
-                <?php while ($person = $users_result->fetch_assoc()): ?>
+                <div class="conversation-list">
 
-                    <p>
+                    <?php while ($person = $users_result->fetch_assoc()): ?>
 
                         <a
                             href="messages.php?user_id=<?php echo $person["id"]; ?>"
+                            class="conversation-item"
                         >
 
-                            <i class="fas fa-user"></i>
+                            <strong>
 
-                            <?php
-                            echo htmlspecialchars(
-                                $person["full_name"]
-                            );
-                            ?>
+                                <i class="fas fa-user"></i>
 
-                            -
-                            <?php
-                            echo htmlspecialchars(
-                                ucfirst($person["role"])
-                            );
-                            ?>
+                                <?php
+                                echo htmlspecialchars(
+                                    $person["full_name"]
+                                );
+                                ?>
+
+                            </strong>
+
+                            <span>
+
+                                <?php
+                                echo htmlspecialchars(
+                                    ucfirst($person["role"])
+                                );
+                                ?>
+
+                                - Open conversation
+
+                            </span>
 
                         </a>
 
-                    </p>
+                    <?php endwhile; ?>
 
-                <?php endwhile; ?>
+                </div>
 
 
             <?php else: ?>
@@ -405,68 +415,99 @@ $users_result = $stmt->get_result();
                 <?php if (count($conversation) > 0): ?>
 
 
-                    <?php foreach ($conversation as $chat): ?>
+                    <!-- MESSAGE BOX -->
 
-                        <div>
+                    <div class="message-box">
 
-                            <p>
+                        <?php foreach ($conversation as $chat): ?>
 
-                                <strong>
+                            <?php
 
-                                    <?php
-                                    echo htmlspecialchars(
-                                        $chat["full_name"]
-                                    );
-                                    ?>
+                            if ($chat["sender_id"] == $user_id) {
 
-                                </strong>
+                                $message_class = "sent";
 
-                            </p>
+                            } else {
 
+                                $message_class = "received";
 
-                            <p>
+                            }
 
-                                <?php
-                                echo nl2br(
-                                    htmlspecialchars(
-                                        $chat["message"]
-                                    )
-                                );
-                                ?>
-
-                            </p>
+                            ?>
 
 
-                            <small>
+                            <div
+                                class="chat-message <?php echo $message_class; ?>"
+                            >
 
-                                <?php
-                                echo htmlspecialchars(
-                                    $chat["created_at"]
-                                );
-                                ?>
-
-                            </small>
+                                <div class="message-content">
 
 
-                            <hr>
+                                    <strong>
 
-                        </div>
+                                        <?php
+                                        echo htmlspecialchars(
+                                            $chat["full_name"]
+                                        );
+                                        ?>
 
-                    <?php endforeach; ?>
+                                    </strong>
+
+
+                                    <p>
+
+                                        <?php
+                                        echo nl2br(
+                                            htmlspecialchars(
+                                                $chat["message"]
+                                            )
+                                        );
+                                        ?>
+
+                                    </p>
+
+
+                                    <small>
+
+                                        <?php
+                                        echo htmlspecialchars(
+                                            $chat["created_at"]
+                                        );
+                                        ?>
+
+                                    </small>
+
+
+                                </div>
+
+                            </div>
+
+
+                        <?php endforeach; ?>
+
+                    </div>
 
 
                 <?php else: ?>
 
-                    <p>
-                        No messages yet. Start the conversation.
-                    </p>
+                    <div class="message-box">
+
+                        <p>
+                            No messages yet. Start the conversation.
+                        </p>
+
+                    </div>
 
                 <?php endif; ?>
 
 
+
                 <!-- SEND MESSAGE -->
 
-                <form method="POST">
+                <form
+                    method="POST"
+                    class="message-form"
+                >
 
                     <input
                         type="hidden"
